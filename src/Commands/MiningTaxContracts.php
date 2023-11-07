@@ -3,6 +3,7 @@
 namespace pyTonicis\Seat\SeatCorpMiningTax\Commands;
 
 use Illuminate\Console\Command;
+use pyTonicis\Seat\SeatCorpMiningTax\Jobs\UpdateContracts;
 
 class MiningTaxContracts extends Command
 {
@@ -12,6 +13,10 @@ class MiningTaxContracts extends Command
 
     public function handle()
     {
-        UpdateContracts::dispatch();
+        if($this->option('now')) {
+            UpdateContracts::dispatchNow($this->option('force'));
+        } else {
+            UpdateContracts::dispatch($this->option('force'));
+        }
     }
 }

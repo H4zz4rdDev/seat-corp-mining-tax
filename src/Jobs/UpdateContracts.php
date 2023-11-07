@@ -32,7 +32,6 @@ class UpdateContracts implements ShouldQueue
 
     public function handle()
     {
-        $settings = $this->settingService->getAll();
         $this->contractService->setContractIds($this->settingService->getValue('corporation_id'));
         $this->contractService->updateContractStatus($this->settingService->getValue('corporation_id'));
     }

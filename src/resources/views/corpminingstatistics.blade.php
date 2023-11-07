@@ -81,29 +81,12 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Top 5 Miner's <small>(over all)</small></h3>
+                    <h3 class="card-title">Corporation Moon Minings<small>(last 12 month's)</small></h3>
                 </div>
                 <div class="card-body">
-                    <table class="table" id="mining_report">
-                        <thead>
-                        <tr>
-                            <td>Name</td>
-                            <td>Mined Quantity (units)</td>
-                            <td>Mined Volume (m3)</td>
-                            <td>Mineral Price (isk)</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($top_ten_miners as $miner)
-                            <tr>
-                                <td>{{ $miner->name }}</td>
-                                <td>{{ number_format($miner->quantity) }}</td>
-                                <td>{{ number_format($miner->volume) }}</td>
-                                <td>{{ number_format($miner->price) }}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
+                    <div style="height: 350px">
+                        <canvas id="moon_mining_chart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -140,3 +123,42 @@
         </div>
     </div>
 @stop
+@push('javascript')
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+        const data = {
+            labels: @json($moon_mining->date),
+            datasets: [
+                {
+                    label: 'Quantity',
+                    data: @json($moon_mining->quantity),
+                    backgroundColor: '#acc239',
+                    borderColor: '#acc239',
+                    borderWidth: 1
+                },
+            ]
+        };
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }, },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            },
+        };
+
+        new Chart(document.getElementById('moon_mining_chart').getContext('2d'), config);
+        });
+    </script>
+@endpush

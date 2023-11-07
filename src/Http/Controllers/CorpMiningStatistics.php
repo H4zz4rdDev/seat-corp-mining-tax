@@ -2,6 +2,7 @@
 
 namespace pyTonicis\Seat\SeatCorpMiningTax\Http\Controllers;
 
+use pyTonicis\Seat\SeatCorpMiningTax\Services\SettingService;
 use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -10,6 +11,11 @@ use Illuminate\Support\Js;
 
 class CorpMiningStatistics extends Controller
 {
+    public function __construct()
+    {
+        $this->settingService = new SettingService();
+    }
+
     public function getHome()
     {
         $act_m = (date('m', time()));
@@ -20,6 +26,12 @@ class CorpMiningStatistics extends Controller
         $total_tax = 0;
         $minings = DB::table('corp_mining_tax')
             ->select('*')
+            ->get();
+        $moon_mining = DB::table('corporation_industry_mining_observer_data')
+            ->selectRaw('sum(quantity) as quantity, DATE_FORMAT(updated_at, "%Y-%m") as date')
+            ->groupBy('date')
+            ->orderBy('date', 'desc')
+            ->limit(12)
             ->get();
         foreach ($minings as $mining) {
             $total_units += $mining->quantity;
@@ -63,6 +75,7 @@ class CorpMiningStatistics extends Controller
             'top_ten_miners' => $top_ten_miners,
             'top_ten_miners_last' => $top_ten_miners_last,
             'total_event_price' => $total_event_price,
+            'moon_mining' => $moon_mining,
         ]);
     }
 }
